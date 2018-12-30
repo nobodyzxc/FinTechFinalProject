@@ -60,7 +60,7 @@ function getDish(r_name) {
     return dishes[0].values
 }
 
-/* 將資料庫匯出 */
+/* export DB */
 // Export the database to an Uint8Array containing the SQLite database file
 // var data = db.export();
 // var buffer = new Buffer(data);
