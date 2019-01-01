@@ -39,4 +39,15 @@ router.post('/order', function(req, res, next) {
 });
 
 
+router.get('/people', function(req, res, next) {
+  //console.log(req.query.shop)
+  res.send([
+    {name: "左撇子", number: 50, avail: 10},
+    {name: "四五大街", number: 60, avail: 20},
+    {name: "八方雲集", number: 30, avail: 30}
+  ]);
+
+});
+
+
 module.exports = router;
