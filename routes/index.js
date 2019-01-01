@@ -15,11 +15,28 @@ router.get('/shops', function(req, res, next) {
 router.get('/menuOf', function(req, res, next) {
   //console.log(req.query.shop)
   res.send([
-    {name: '白飯', value: 10},
-    {name: '小菜', value: 30 },
-    {name: '貢丸湯', value: 30}
+    {id: 0, name: '白飯', value: 10},
+    {id: 1, name: '小菜', value: 30 },
+    {id: 2, name: '貢丸湯', value: 30}
   ]);
 
 });
+
+router.post('/order', function(req, res, next) {
+  /* { shop: "四五大街",
+   *   dish: [
+   *     { id: 0, amount: 2 }
+   *     { id: 3, amount: 4 }
+   *   ],
+   *   price: 100
+   * }
+   * */
+  //console.log(req.body)
+  res.send({
+    status: "success",
+    code: 200
+  });
+});
+
 
 module.exports = router;

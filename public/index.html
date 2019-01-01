@@ -16,9 +16,9 @@
 
     <script src="javascripts/bootstrap-input-spinner.js"></script>
     <script>
-      //$(document).ready(function() {
-      //  $("input[type='number']").inputSpinner();
-      //});
+      $(document).ready(function() {
+        $("input[type='number']").inputSpinner();
+      });
     </script>
 
   </head>
@@ -46,18 +46,27 @@
       <!-- Tab panes -->
       <div class="tab-content">
         <div id="takeout" class="container tab-pane active"><br>
-          <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-              請選擇商家
-            </button>
-            <div id='shops' class="dropdown-menu">
-              <!--
-                <a class="dropdown-item" href="#">左撇子</a>
-                <a class="dropdown-item" href="#">四五大街</a>
-                <a class="dropdown-item" href="#">八方雲集</a>
-              -->
+          <br>
+          <br>
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  請選擇商家
+                </button>
+                <div id='shops' class="dropdown-menu">
+                </div>
+              </div>
             </div>
-          </div><br><br>
+            <div class="col">
+              <h3 id="shopname"></h3>
+            </div>
+            <div class="col">
+              <input id='defaultVal' type="number" value="1" min="1" step="1"/>
+            </div>
+          </div>
+          <br>
+          <br>
           <div class="row">
             <div id="menu-div" class="col">
               <table class="table">
@@ -74,18 +83,27 @@
             </div>
             <div id="cart-div" class="col">
               <form>
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>cancel</th>
-                    <th>name</th>
-                    <th>number</th>
-                  </tr>
-                </thead>
-                <tbody id="cart">
-                </tbody>
-              </table>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>name</th>
+                      <th>number</th>
+                      <th>cancel</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cart">
+                  </tbody>
+                </table>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th><p id='totalVal'>總金額: 0 元</p></th>
+                      <th><button onclick="submitMenu()" type="button" class="btn btn-primary">Submit</button></th>
+                    </tr>
+                  </thead>
+                </table>
               </form>
+
             </div>
           </div>
         </div>

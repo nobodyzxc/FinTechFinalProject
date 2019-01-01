@@ -9,35 +9,68 @@ $(document).ready(function() {
 });
 
 function menuOf(shop){
+  $('#shopname').text(shop);
   $.get('/menuOf',{
     shop: shop
   }, function (menu) {
     $('#menu').empty();
+    $('#cart').empty();
+    calculatePrice();
     for (let dish of menu) {
       $('#menu').append(`<tr><td>${dish.name}</td><td>${dish.value}</td><td><button type="button" class="btn btn-primary" onclick='addDish(${JSON.stringify(dish)});'>+</button></td><tr>`)
     }
   });
 }
 
+function delDish(del_button){
+  $(del_button).parent().parent().remove();
+  calculatePrice();
+}
+
+function totalPrice(){
+  var total = 0;
+  var arr = [...document.getElementsByClassName('form-item')];
+  for(let i = 0; i < arr.length; i++){
+    total += arr[i].nextSibling.value * arr[i].nextSibling.nextSibling.value;
+  }
+  return total;
+}
+
+function calculatePrice(){
+  var total = totalPrice();
+  $('#totalVal').text('總金額: ' + String(total) + ' 元');
+}
+
+function submitMenu(){
+
+  var form = {
+    shop: $('#shopname').text(),
+    dish:[],
+    price: totalPrice()
+  };
+
+  var arr = [...document.getElementsByClassName('form-item')];
+
+  for(let i = 0; i < arr.length; i++){
+    form['dish'].push({
+      id: arr[i].value,                   // dish id
+      amount: arr[i].nextSibling.value,   // dish amount
+    });
+    //arr[i].nextSibling.nextSibling.value;  // dish price
+  }
+
+  $.post('/order', form, function(result) {
+    alert("form submited");
+  });
+
+}
+
 function addDish(dish){
-  let config = {
-    decrementButton: "<strong>-</strong>", // button text
-    incrementButton: "<strong>+</strong>", // ..
-    groupClass: "", // css class of the input-group (sizing with input-group-sm or input-group-lg)
-    buttonsClass: "btn-outline-secondary",
-    buttonsWidth: "4px",
-    textAlign: "center",
-    autoDelay: 500, // ms holding before auto value change
-    autoInterval: 100, // speed of auto value change
-    boostThreshold: 10, // boost after these steps
-    boostMultiplier: "auto", // you can also set a constant number as multiplier
-    locale: null // the locale for number rendering; if null, the browsers language is used
+
+  if($('.cart-item') && [...document.getElementsByClassName('cart-item')].map(elt=>elt.textContent).indexOf(dish.name) >= 0){
+    return;
   }
-  let dishes = $('.dishes')
-  if(dishes){
-    alert(dishes.map(elt => elt.children().first().val()))
-  }
-  $('#cart').append(`<tr><td>${dish.name}</td><td><input type="number" value="1" min="1" step="1"/></td><td><button type="button" class="btn btn-primary">X</button></td></tr>`)
-  $("input[type='number']").inputSpinner(config);
+  $('#cart').append(`<tr><td class='cart-item'>${dish.name}</td><td><input class='form-item' type="hidden" value="${dish.id}"><input type="number" value="${$('#defaultVal').val()}" min="1" step="1" onchange='calculatePrice();'/><input type="hidden" value="${dish.value}"></td><td><button type="button" class="btn btn-primary" onclick='delDish(this);'>X</button></td></tr>`)
+  calculatePrice();
 }
 
