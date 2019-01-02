@@ -51,8 +51,8 @@ function submitMenu(){
     //arr[i].nextSibling.nextSibling.value;  // dish price
   }
 
-  $.post('/order', form, function(result) {
-    alert("form submited");
+  $.post('/post_order', form, function(result) {
+    alert("form submited\n" + JSON.stringify(form));
   });
 
 }

@@ -4,6 +4,7 @@ $(document).ready(function() {
   $.get('/shops', function (shops) {
     for (let shop of shops) {
       $('#shops').append(`<a class="dropdown-item" href="#" onclick='menuOf("${shop}")'>${shop}</a>`)
+      $('#upload-shops').append(`<a class="dropdown-item" href="#" onclick='uploadTo("${shop}")'>${shop}</a>`)
     }
   })
 });

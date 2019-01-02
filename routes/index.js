@@ -7,6 +7,11 @@ router.get('/', function(req, res, next) {
   res.render('index')
 });
 
+router.get('/order', function(req, res, next) {
+  //res.render('index', { title: 'Express' });
+  res.render('order')
+});
+
 router.get('/shops', function(req, res, next) {
   /* database here */
   res.send(["左撇子", "四五大街", "八方雲集"]);
@@ -22,7 +27,7 @@ router.get('/menuOf', function(req, res, next) {
 
 });
 
-router.post('/order', function(req, res, next) {
+router.post('/post_order', function(req, res, next) {
   /* { shop: "四五大街",
    *   dish: [
    *     { id: 0, amount: 2 }
