@@ -9,7 +9,7 @@ google map ref: [URL](https://noob.tw/web-visualization-google-maps/)
 
 TODO:
 
-人潮地圖-調用 Google API
-Database 需要匯入菜單及接上後端
-人潮回報上傳相片功能再討論
-智能合約需要接上 web3
+- 人潮地圖-調用 Google API
+- Database 需要匯入菜單及接上後端
+- 人潮回報上傳相片功能再討論
+- 智能合約需要接上 web3
