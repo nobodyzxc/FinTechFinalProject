@@ -1,11 +1,259 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title>人潮回報及下單系統</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <!--
+      <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+      -->
+
+
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+      <script>
+        var map;
+        var shopmap;
+        var circles = {};
+        var markers = [];
+        function startMap(){
+          $.get('/people_map', function(result){
+            shopmap = result;
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+            s.src = "https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW";
+            s.async = true;
+            s.defer = true;
+            $("head").append(s);
+          });
+        }
+
+        function initMap(){
+
+          map = new google.maps.Map(
+            document.getElementById('map'), {
+              center: {lat: 24.986427, lng: 121.575684},
+              zoom: 16.5,
+            });
+          // Construct the circle for each value in citymap.
+          // Note: We scale the area of the circle based on the population.
+          for (var shop in shopmap) {
+            // Add the circle for this shop to the map.
+            console.log(shop);
+            var shopCircle = new google.maps.Circle({
+              strokeColor: '#FF0000',
+              strokeOpashop: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF0000',
+              fillOpashop: 0.35,
+              map: map,
+              center: shopmap[shop].center,
+              radius: Math.sqrt(shopmap[shop].population) * 5
+            });
+            circles[shop] = shopCircle;
+          }
+
+
+          drop = function() {
+            console.log(shopmap);
+            clearMarkers();
+            var i = 0;
+            for (var shop in shopmap){
+              addMarkerWithTimeout(shopmap[shop].center, i * 200);
+              i += 1;
+            }
+          }
+
+          function addMarkerWithTimeout(position, timeout) {
+            window.setTimeout(function() {
+              markers.push(new google.maps.Marker({
+                position: position,
+                map: map,
+                animation: google.maps.Animation.DROP
+              }));
+            }, timeout);
+          }
+
+          function clearMarkers() {
+            for (var i = 0; i < markers.length; i++) {
+              markers[i].setMap(null);
+            }
+            markers = [];
+          }
+        }
+      </script>
+
+      <script src="javascripts/index.js"></script>
+      <script src="javascripts/order.js"></script>
+      <script src="javascripts/rank.js"></script>
+      <script src="javascripts/upload.js"></script>
+
+      <script src="javascripts/bootstrap-input-spinner.js"></script>
+      <script>
+        $(document).ready(function() {
+          $("input[type='number']").inputSpinner();
+          startMap();
+        });
+      </script>
+
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+
+    <div class="container mt-3">
+      <h2>數位金融期末專案</h2>
+      <br>
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs nav-justified">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
+        </li>
+        <li class="nav-item">
+          <a onclick='drop();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#heatrank">人潮排名</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#heatupload">人潮回報</a>
+        </li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="takeout" class="container tab-pane active"><br>
+          <br>
+          <br>
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  請選擇商家
+                </button>
+                <div id='shops' class="dropdown-menu">
+                  <% for(var i = 0; i < shops.length; i++){ %>
+                  <a class="dropdown-item" href="#" onclick='menuOf("<%= shops[i] %>")'><%= shops[i] %></a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <h3 id="shopname"></h3>
+            </div>
+            <div class="col">
+              <input id='defaultVal' type="number" value="1" min="1" step="1"/>
+            </div>
+          </div>
+          <br>
+          <br>
+          <div class="row">
+            <div id="menu-div" class="col">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>price</th>
+                    <th>add</th>
+                  </tr>
+                </thead>
+                <tbody id="menu">
+                </tbody>
+              </table>
+            </div>
+            <div id="cart-div" class="col">
+              <form>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>name</th>
+                      <th>number</th>
+                      <th>cancel</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cart">
+                  </tbody>
+                </table>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th><p id='totalVal'>總金額: 0 元</p></th>
+                      <th><button onclick="submitMenu()" type="button" class="btn btn-primary">Submit</button></th>
+                    </tr>
+                  </thead>
+                </table>
+              </form>
+
+            </div>
+          </div>
+        </div>
+        <div id="heatmap" class="container tab-pane fade"><br>
+          <div id="map"></div>
+        </div>
+        <div id="heatrank" class="container tab-pane fade"><br>
+          <table id="rankTable" class="table table-striped table-bordered" style="width:100%">
+            <thead>
+              <tr>
+                <th>Restaurant</th>
+                <th>Customer</th>
+                <th>Available</th>
+                <th>Heat</th>
+              </tr>
+            </thead>
+            <tbody id="people"> </tbody>
+            <tfoot>
+              <tr>
+                <th>Restaurant</th>
+                <th>Customer</th>
+                <th>Available</th>
+                <th>Heat</th>
+              </tr>
+            </tfoot>
+
+          </table>
+        </div>
+        <div id="heatupload" class="container tab-pane fade"><br>
+          <br><br>
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  請選擇商家
+                </button>
+                <div id='upload-shops' class="dropdown-menu">
+                  <% for(var i = 0; i < shops.length; i++){ %>
+                  <a class="dropdown-item" href="#" onclick='uploadTo("<%= shops[i] %>")'><%= shops[i] %></a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <h3 id="upload-shopname"></h3>
+            </div>
+            <!--
+              <div class="col">
+              <input id='defaultVal' type="number" value="1" min="1" step="1"/>
+              </div>
+            -->
+          </div>
+          <br><br>
+          <form action="/somewhere/to/upload" enctype="multipart/form-data">
+            <input type="file" id="progressbarTWInput" accept="image/gif, image/jpeg, image/png"/ >
+            <img id="preview_progressbarTW_img" src="#" />
+          </form>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>

@@ -1,5 +1,7 @@
 'use strict'
 
+var socket = io.connect();
+
 function menuOf(shop){
   $('#shopname').text(shop);
   $.get('/menuOf',{
@@ -35,26 +37,33 @@ function calculatePrice(){
 
 function submitMenu(){
 
-  var form = {
-    shop: $('#shopname').text(),
-    dish:[],
-    price: totalPrice()
-  };
 
   var arr = [...document.getElementsByClassName('form-item')];
 
-  for(let i = 0; i < arr.length; i++){
-    form['dish'].push({
-      id: arr[i].value,                   // dish id
-      amount: arr[i].nextSibling.value,   // dish amount
-    });
-    //arr[i].nextSibling.nextSibling.value;  // dish price
-  }
+  var form = {
+    shop: $('#shopname').text(),
+    dish: arr.map(function(elt){
+      return { id: elt.value, amount: elt.nextSibling.value };
+    }),
+    price: totalPrice()
+  };
 
-  $.post('/post_order', form, function(result) {
-    alert("form submited\n" + JSON.stringify(form));
+  //for(let i = 0; i < arr.length; i++){
+  //  form.dish.push({
+  //    id: arr[i].value,                   // dish id
+  //    amount: arr[i].nextSibling.value,   // dish amount
+  //  });
+  //  //arr[i].nextSibling.nextSibling.value;  // dish price
+  //}
+
+  //alert("form submited\n" + JSON.stringify(form));
+  //
+  $.post('/post_order', {order: JSON.stringify(form)}, function(result) {
+    socket.emit('new order', $('#shopname').text());
+    alert(JSON.stringify(result));
+    $('#cart').empty();
+    calculatePrice();
   });
-
 }
 
 function addDish(dish){
@@ -65,3 +74,4 @@ function addDish(dish){
   $('#cart').append(`<tr><td class='cart-item'>${dish.name}</td><td><input class='form-item' type="hidden" value="${dish.id}"><input type="number" value="${$('#defaultVal').val()}" min="1" step="1" onchange='calculatePrice();'/><input type="hidden" value="${dish.value}"></td><td><button type="button" class="btn btn-primary" onclick='delDish(this);'>X</button></td></tr>`)
   calculatePrice();
 }
+

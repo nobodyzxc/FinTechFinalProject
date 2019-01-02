@@ -13,8 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-    <script src="javascripts/receive.js"></script>
-
   </head>
   <body>
     <div class="container mt-3">
@@ -30,6 +28,9 @@
               請選擇商家
             </button>
             <div id='shops' class="dropdown-menu">
+                <% for(var i = 0; i < shops.length; i++){ %>
+                <a class="dropdown-item" href="/users/<%= shops[i] %>" ><%= shops[i] %></a>
+                <% } %>
             </div>
           </div>
         </div>
@@ -37,5 +38,3 @@
     </div>
   </body>
 </html>
-
-
