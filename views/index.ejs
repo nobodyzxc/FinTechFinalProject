@@ -25,82 +25,22 @@
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
-    <script>
-      var map;
-      var shopmap = <%- JSON.stringify(people_map) %>;
-      var circles = {};
-      var markers = [];
-      function initMap(){
+    <script src="javascripts/bootstrap-input-spinner.js"></script>
 
-        map = new google.maps.Map(
-          document.getElementById('map'), {
-            center: {lat: 24.986427, lng: 121.575684},
-            zoom: 16.5,
-          });
-        // Construct the circle for each value in citymap.
-        // Note: We scale the area of the circle based on the population.
-        for (var shop in shopmap) {
-          // Add the circle for this shop to the map.
-          var shopCircle = new google.maps.Circle({
-            strokeColor: '#FF0000',
-            strokeOpashop: 0.8,
-            strokeWeight: 2,
-            fillColor: '#FF0000',
-            fillOpashop: 0.35,
-            map: map,
-            center: shopmap[shop].center,
-            radius: Math.sqrt(shopmap[shop].population) * 5
-          });
-          circles[shop] = shopCircle;
-        }
-
-
-        drop = function() {
-          clearMarkers();
-          var i = 0;
-          for (var shop in shopmap){
-            addMarkerWithTimeout(shopmap[shop].center, i * 200);
-            i += 1;
-          }
-        }
-
-        function addMarkerWithTimeout(position, timeout) {
-          window.setTimeout(function() {
-            markers.push(new google.maps.Marker({
-              position: position,
-              map: map,
-              animation: google.maps.Animation.DROP
-            }));
-          }, timeout);
-        }
-
-        function clearMarkers() {
-          for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-          }
-          markers = [];
-        }
-      }
-    </script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW" async defer></script>
-
+    <!-- self defined scripts -->
 
     <script src="javascripts/index.js"></script>
-    <script src="javascripts/order.js"></script>
+    <script>
+      shopmap = <%- JSON.stringify(people_map) %>;
+    </script>
     <script src="javascripts/rank.js"></script>
+    <script src="javascripts/maps.js"></script>
+    <script src="javascripts/order.js"></script>
     <script src="javascripts/upload.js"></script>
 
-    <script src="javascripts/bootstrap-input-spinner.js"></script>
-    <script>
-      var rankTable = undefined;
-      $(document).ready(function() {
-        $("input[type='number']").inputSpinner();
-        rankTable = $('#rankTable').DataTable({
-          "order": [[ 3, "desc" ]]
-        });
-      });
-    </script>
+    <!-- self defined end -->
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW" async defer></script>
 
   </head>
   <body>
@@ -114,7 +54,7 @@
           <a class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
         </li>
         <li class="nav-item">
-          <a onclick='drop();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
+          <a onclick='dropMarkers();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#heatrank">人潮排名</a>
@@ -192,6 +132,17 @@
           </div>
         </div>
         <div id="heatmap" class="container tab-pane fade"><br>
+          <ul class="nav nav-pills nav-justified">
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link active" data-toggle="tab" href="">客滿程度</a>
+            </li>
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link" data-toggle="tab" href="">空位數</a>
+            </li>
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link" data-toggle="tab" href="">顧客人數</a>
+            </li>
+          </ul>
           <div id="map"></div>
         </div>
         <div id="heatrank" class="container tab-pane fade"><br>
@@ -201,19 +152,19 @@
 
             <thead>
               <tr>
-                <th>Restaurant</th>
-                <th>Customer</th>
-                <th>Available</th>
-                <th>Heat</th>
+                <th>餐廳</th>
+                <th>客滿程度</th>
+                <th>空位數</th>
+                <th>顧客人數</th>
               </tr>
             </thead>
             <tbody id="people">
               <% for(let r of people_rank){ %>
               <tr>
                 <td><%= r.name %></td>
-                <td><%= r.number %></td>
-                <td><%= r.avail %></td>
                 <td><%= Math.floor(r.number / (r.avail + r.number) * 100) %>%</td>
+                <td><%= r.avail %></td>
+                <td><%= r.number %></td>
               </tr>
               <% } %>
             </tbody>
@@ -256,23 +207,23 @@
           <div id="uploadInput" class='invisible'>
             <input onchange="updateProgress(this)" id='peopleSpinner' type="number" value="1" min="1" step="1"/>
 
-          <br>
+            <br>
 
-          <div class="progress">
-            <div id='peopleBar' class="progress-bar" style="width:70%">70%</div>
-          </div>
+            <div class="progress">
+              <div id='peopleBar' class="progress-bar" style="width:70%">70%</div>
+            </div>
 
-          <br><br>
+            <br><br>
 
-          <button onclick="uploadPeople()" type="button" class="btn btn-primary float-right">Upload</button>
+            <button onclick="uploadPeople()" type="button" class="btn btn-primary float-right">Upload</button>
           </div>
 
           <!-- image uploading
-          <br><br>
-          <form action="/somewhere/to/upload" enctype="multipart/form-data">
+            <br><br>
+            <form action="/somewhere/to/upload" enctype="multipart/form-data">
             <input type="file" id="progressbarTWInput" accept="image/gif, image/jpeg, image/png"/ >
             <img id="preview_progressbarTW_img" src="#" />
-          </form>
+            </form>
           -->
         </div>
       </div>

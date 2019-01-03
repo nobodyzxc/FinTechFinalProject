@@ -1,19 +1,25 @@
-socket.on('renew people', function(data){
-  //if($('#shopname').text() == data){
-  //  updateOrder($('#shopname').text(), 'padding');
-  //}
-  //rankTable
-  //      .row( this )
-  //      .data( d )
-  //      .draw();
-  data = JSON.parse(data);
-  newRow = [data.name, String(data.number), String(data.avail), String(Math.floor(data.number / data.total * 100)) + '%'];
-  rankTable.row($(`td:contains("${data.name}")`)[0].parentElement).data(newRow).draw();
-});
+'use strict'
 
-$('#people').on( 'hover', 'tr', function () {
-    alert( table.row( this ).data() );
-} );
+function getShopDataOf(type){
+
+  var data = {};
+  var myRows = [];
+  var $headers = $("#rankTable th");
+  var $rows = $('#rankTable tbody tr').each(function(index) {
+    var $cells = $(this).find("td");
+    myRows[index] = {};
+    $cells.each(function(cellIndex) {
+      if(cellIndex > 0 && $($headers[cellIndex]).html() == type){
+        //data[$cells.html()][$($headers[cellIndex]).html()] = $(this).html();
+        data[$cells.html()] = parseInt($(this).html());
+      }
+      //else{
+      //  data[$cells.html()] = {};
+      //}
+    });
+  });
+  return data;
+}
 
 //function updatePeopleRank(){
 //  $.get('/people', async function (res) {
