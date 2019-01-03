@@ -6,7 +6,9 @@ var database = require('./database');
 router.get('/', function(req, res, next) {
   res.render('index', {
     shops: database.getAllRestaruants(),
-    key: process.env.apiKey
+    key: process.env.apiKey,
+    people_map: people_map(),
+    people_rank: people_rank()
   })
 });
 
@@ -52,6 +54,7 @@ router.post('/post_order', function(req, res, next) {
    * */
 
   console.log(req.body);
+  /* tricky line to avoid unknown bug */
   req.body = JSON.parse(req.body.order);
 
   let dishes = req.body.dish;
@@ -72,18 +75,31 @@ router.post('/post_order', function(req, res, next) {
 });
 
 
-router.get('/people', function(req, res, next) {
-  //console.log(req.query.shop)
-  res.send(database.getHeat().map(function(elt){
+router.get('/uploadPeople', function(req, res, next) {
+  let succ = database.updateHeat(req.query.name, req.query.value);
+  res.send({
+    status: succ ? "success" : "failed",
+    code: succ ? 200 : 500
+  });
+});
+
+function people_rank(){
+  return database.getHeat().map(function(elt){
     return {
       name: elt[0],
       number: elt[1],
-      avail: elt[2] - elt[1]
-    }
-  }));
+      avail: elt[2] - elt[1],
+      total: elt[2]
+    };
+  });
+}
+
+router.get('/people_rank', function(req, res, next) {
+  res.send(people_rank());
 });
 
-router.get('/people_map', function(req, res, next) {
+
+function people_map(){
   var rtn = {};
   var locs = database.getAllLocations();
   var heats = database.getHeat();
@@ -96,8 +112,11 @@ router.get('/people_map', function(req, res, next) {
   for(var i = 0; i < heats.length; i++){
     rtn[heats[i][0]].population = heats[i][1];
   }
+  return rtn;
+}
 
-  res.send(rtn);
+router.get('/people_map', function(req, res, next) {
+  res.send(people_map());
 });
 
 router.get('/drop', function(req, res, next) {

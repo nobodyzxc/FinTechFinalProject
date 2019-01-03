@@ -5,108 +5,102 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+    <!-- dataTable styles, select one -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <!-- style end -->
+
     <link rel="stylesheet" href="stylesheets/style.css">
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-    <!--
-      <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
-      -->
 
 
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
 
-      <script>
-        var map;
-        var shopmap;
-        var circles = {};
-        var markers = [];
-        function startMap(){
-          $.get('/people_map', function(result){
-            shopmap = result;
-            var s = document.createElement("script");
-            s.type = "text/javascript";
-            s.src = "https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW";
-            s.async = true;
-            s.defer = true;
-            $("head").append(s);
+    <script>
+      var map;
+      var shopmap = <%- JSON.stringify(people_map) %>;
+      var circles = {};
+      var markers = [];
+      function initMap(){
+
+        map = new google.maps.Map(
+          document.getElementById('map'), {
+            center: {lat: 24.986427, lng: 121.575684},
+            zoom: 16.5,
           });
+        // Construct the circle for each value in citymap.
+        // Note: We scale the area of the circle based on the population.
+        for (var shop in shopmap) {
+          // Add the circle for this shop to the map.
+          var shopCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpashop: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpashop: 0.35,
+            map: map,
+            center: shopmap[shop].center,
+            radius: Math.sqrt(shopmap[shop].population) * 5
+          });
+          circles[shop] = shopCircle;
         }
 
-        function initMap(){
 
-          map = new google.maps.Map(
-            document.getElementById('map'), {
-              center: {lat: 24.986427, lng: 121.575684},
-              zoom: 16.5,
-            });
-          // Construct the circle for each value in citymap.
-          // Note: We scale the area of the circle based on the population.
-          for (var shop in shopmap) {
-            // Add the circle for this shop to the map.
-            console.log(shop);
-            var shopCircle = new google.maps.Circle({
-              strokeColor: '#FF0000',
-              strokeOpashop: 0.8,
-              strokeWeight: 2,
-              fillColor: '#FF0000',
-              fillOpashop: 0.35,
+        drop = function() {
+          clearMarkers();
+          var i = 0;
+          for (var shop in shopmap){
+            addMarkerWithTimeout(shopmap[shop].center, i * 200);
+            i += 1;
+          }
+        }
+
+        function addMarkerWithTimeout(position, timeout) {
+          window.setTimeout(function() {
+            markers.push(new google.maps.Marker({
+              position: position,
               map: map,
-              center: shopmap[shop].center,
-              radius: Math.sqrt(shopmap[shop].population) * 5
-            });
-            circles[shop] = shopCircle;
-          }
-
-
-          drop = function() {
-            console.log(shopmap);
-            clearMarkers();
-            var i = 0;
-            for (var shop in shopmap){
-              addMarkerWithTimeout(shopmap[shop].center, i * 200);
-              i += 1;
-            }
-          }
-
-          function addMarkerWithTimeout(position, timeout) {
-            window.setTimeout(function() {
-              markers.push(new google.maps.Marker({
-                position: position,
-                map: map,
-                animation: google.maps.Animation.DROP
-              }));
-            }, timeout);
-          }
-
-          function clearMarkers() {
-            for (var i = 0; i < markers.length; i++) {
-              markers[i].setMap(null);
-            }
-            markers = [];
-          }
+              animation: google.maps.Animation.DROP
+            }));
+          }, timeout);
         }
-      </script>
 
-      <script src="javascripts/index.js"></script>
-      <script src="javascripts/order.js"></script>
-      <script src="javascripts/rank.js"></script>
-      <script src="javascripts/upload.js"></script>
+        function clearMarkers() {
+          for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+          }
+          markers = [];
+        }
+      }
+    </script>
 
-      <script src="javascripts/bootstrap-input-spinner.js"></script>
-      <script>
-        $(document).ready(function() {
-          $("input[type='number']").inputSpinner();
-          startMap();
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW" async defer></script>
+
+
+    <script src="javascripts/index.js"></script>
+    <script src="javascripts/order.js"></script>
+    <script src="javascripts/rank.js"></script>
+    <script src="javascripts/upload.js"></script>
+
+    <script src="javascripts/bootstrap-input-spinner.js"></script>
+    <script>
+      var rankTable = undefined;
+      $(document).ready(function() {
+        $("input[type='number']").inputSpinner();
+        rankTable = $('#rankTable').DataTable({
+          "order": [[ 3, "desc" ]]
         });
-      </script>
+      });
+    </script>
 
   </head>
   <body>
@@ -201,7 +195,10 @@
           <div id="map"></div>
         </div>
         <div id="heatrank" class="container tab-pane fade"><br>
-          <table id="rankTable" class="table table-striped table-bordered" style="width:100%">
+          <!-- <table id="rankTable" class="" style="width:100%"> -->
+          <!-- <table id="rankTable" class="table table-striped  row-border hover order-column" style="width:100%"> -->
+          <table id="rankTable" class="display dataTable table-bordered" style="width:100%">
+
             <thead>
               <tr>
                 <th>Restaurant</th>
@@ -210,7 +207,16 @@
                 <th>Heat</th>
               </tr>
             </thead>
-            <tbody id="people"> </tbody>
+            <tbody id="people">
+              <% for(let r of people_rank){ %>
+              <tr>
+                <td><%= r.name %></td>
+                <td><%= r.number %></td>
+                <td><%= r.avail %></td>
+                <td><%= Math.floor(r.number / (r.avail + r.number) * 100) %>%</td>
+              </tr>
+              <% } %>
+            </tbody>
             <tfoot>
               <tr>
                 <th>Restaurant</th>
@@ -231,8 +237,8 @@
                   請選擇商家
                 </button>
                 <div id='upload-shops' class="dropdown-menu">
-                  <% for(var i = 0; i < shops.length; i++){ %>
-                  <a class="dropdown-item" href="#" onclick='uploadTo("<%= shops[i] %>")'><%= shops[i] %></a>
+                  <% for(let i = 0; i < people_rank.length; i++){ %>
+                  <a class="dropdown-item" href="#people-rank-<%= i %>" onclick='uploadTo(this)'><%= people_rank[i].name %></a>
                   <% } %>
                 </div>
               </div>
@@ -240,17 +246,34 @@
             <div class="col">
               <h3 id="upload-shopname"></h3>
             </div>
-            <!--
-              <div class="col">
-              <input id='defaultVal' type="number" value="1" min="1" step="1"/>
-              </div>
-            -->
           </div>
+          <br><br>
+
+          <% for(let i = 0; i < people_rank.length; i++){ %>
+          <input id='people-rank-<%= i %>-cur' type="hidden" value="<%= people_rank[i].number %>"/>
+          <input id='people-rank-<%= i %>-tot' type="hidden" value="<%= people_rank[i].total %>"/>
+          <% } %>
+          <div id="uploadInput" class='invisible'>
+            <input onchange="updateProgress(this)" id='peopleSpinner' type="number" value="1" min="1" step="1"/>
+
+          <br>
+
+          <div class="progress">
+            <div id='peopleBar' class="progress-bar" style="width:70%">70%</div>
+          </div>
+
+          <br><br>
+
+          <button onclick="uploadPeople()" type="button" class="btn btn-primary float-right">Upload</button>
+          </div>
+
+          <!-- image uploading
           <br><br>
           <form action="/somewhere/to/upload" enctype="multipart/form-data">
             <input type="file" id="progressbarTWInput" accept="image/gif, image/jpeg, image/png"/ >
             <img id="preview_progressbarTW_img" src="#" />
           </form>
+          -->
         </div>
       </div>
     </div>

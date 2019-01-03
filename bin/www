@@ -31,6 +31,9 @@ io.sockets.on('connection', function(socket) {
      socket.on('new order', function(data){
         io.sockets.emit('renew order', data);
      });
+    socket.on('new people', function(data){
+        io.sockets.emit('renew people', data);
+     });
 });
 
 /**

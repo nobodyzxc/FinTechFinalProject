@@ -18,3 +18,8 @@ color: #00B7FF;
 input[type=number]{
     width: 80px;
 }
+
+.invisiable{
+    display: none;
+    visibility: hidden;
+}

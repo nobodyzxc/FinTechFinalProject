@@ -1,7 +1,5 @@
 'use strict'
 
-var socket = io.connect();
-
 function menuOf(shop){
   $('#shopname').text(shop);
   $.get('/menuOf',{

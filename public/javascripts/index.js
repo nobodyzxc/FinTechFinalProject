@@ -1,5 +1,7 @@
 'use strict'
 
+var socket = io.connect();
+
 //function sortOnKeys(dict) {
 //
 //    var sorted = [];

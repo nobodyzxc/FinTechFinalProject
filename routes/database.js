@@ -47,6 +47,17 @@ module.exports.getHeat = function (){
   return locations[0].values
 }
 
+module.exports.updateHeat = function(name, value){
+  try{
+    db.exec(`UPDATE heat SET people = ${value} WHERE r_name = '${name}';`);
+  }
+  catch(err){
+    console.log(err);
+    return false;
+  }
+  return true;
+}
+
 module.exports.addOrder = function (order){
   var locations = db.exec("SELECT r_name FROM location ")
   return locations[0].values.map(elt=>elt[0])
