@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var database = require('./database');
+var database = require('../modules/database');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', {
-    shops: database.getAllRestaruants(),
+    shops: database.getAllRestaurants(),
     key: process.env.apiKey,
     people_map: people_map(),
     people_rank: people_rank()
@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 router.get('/shops', function(req, res, next) {
   /* database here */
   //res.send(["左撇子", "四五大街", "八方雲集"]);
-  res.send(database.getAllRestaruants());
+  res.send(database.getAllRestaurants());
 });
 
 router.get('/menuOf', function(req, res, next) {

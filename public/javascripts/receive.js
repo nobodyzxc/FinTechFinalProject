@@ -77,7 +77,7 @@ function updateOrder(r_name, status){
             <button onclick="finish(${orders[i].id});" type="button" class="btn btn-primary float-md-right">Finish</button>
           </div>
           <div class="btn-group mr-2 float-md-right" role="group" aria-label="Second group">
-            <button onclick="drop(${orders[i].id});" type="button" class="btn btn-primary float-md-right">Drop</button>
+            <button onclick="drop(${orders[i].id});" type="button" class="btn btn-primary float-md-right">Cancel</button>
           </div>
         </div>
       </div>` : ""

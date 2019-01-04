@@ -37,7 +37,7 @@ module.exports.getAllLocations = function () {
   return locations[0].values
 }
 
-module.exports.getAllRestaruants = function (){
+module.exports.getAllRestaurants = function (){
   var locations = db.exec("SELECT r_name FROM location ")
   return locations[0].values.map(elt=>elt[0])
 }
@@ -148,6 +148,3 @@ module.exports.exec = function(cmd){
   }
   return true;
 }
-//console.log(getAllLocations());
-//console.log(getAllDishes());
-//console.log(getAllRestaruants());
