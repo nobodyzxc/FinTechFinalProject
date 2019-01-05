@@ -5,30 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-
-    <!-- dataTable styles, select one -->
-    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-    <!-- style end -->
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="stylesheets/style.css">
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
-
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-
-    <script src="javascripts/bootstrap-input-spinner.js"></script>
   </head>
   <body>
-
     <nav class="navbar fixed-top navbar-expand-lg navbar navbar-dark bg-dark">
       <a class="navbar-brand" href="#">數位金融期末專案</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,27 +23,42 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/features">Features</a>
+            <a class="nav-link" href="#">Features<span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders</a>
+          <li class="nav-item active dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders<span class="sr-only">(current)</span></a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="/restaurant">Restaurant</a>
-              <a class="dropdown-item" href="/customer">Customer</a>
+              <a class="dropdown-item" href="/restaurant">Restaurant<%- typename == 'restaurant' ? '<span class="sr-only">(current)</span>' : '' %></a>
+              <a class="dropdown-item" href="/customer">Customer<%- typename == 'restaurant'  ? '' : '<span class="sr-only">(current)</span>' %></a>
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/About">About</a>
+            <a class="nav-link" href="/about">About</a>
           </li>
         </ul>
       </div>
     </nav>
 
-    <div class="container mt-3">
-    </div>
 
+    <div class="container mt-3">
+      <br><br>
+      <div class="row">
+        <div class="col">
+          <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+              <%= title %>
+            </button>
+            <div id='shops' class="dropdown-menu">
+              <% for(var i = 0; i < select.length; i++){ %>
+              <a class="dropdown-item" href="/<%= typename %>/<%= select[i] %>" ><%= select[i] %></a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

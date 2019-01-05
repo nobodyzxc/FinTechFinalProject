@@ -1,15 +1,61 @@
 var express = require('express');
 var router = express.Router();
 var database = require('../modules/database');
+var ethereum = require('../modules/ethereum');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', {
-    shops: database.getAllRestaurants(),
-    key: process.env.apiKey,
-    people_map: people_map(),
-    people_rank: people_rank()
-  })
+  });
+});
+
+router.get('/features', function(req, res, next) {
+  ethereum.getUserAccounts(function(accounts){
+    res.render('features', {
+      shops: database.getAllRestaurants(),
+      key: process.env.apiKey,
+      people_map: people_map(),
+      people_rank: people_rank(),
+      accounts: accounts
+    });
+  });
+});
+
+router.get('/restaurant', function(req, res, next) {
+  res.render('select', {
+    typename: 'restaurant',
+    isRestaurant : true,
+    title: '請選擇餐廳',
+    select: database.getAllRestaurants()
+  });
+});
+
+router.get('/restaurant/:name', function(req, res, next) {
+  res.render('restaurant', {
+    shop: req.params.name,
+    orders: database.getOrders(req.params.name, 'padding'),
+    shops: database.getAllRestaurants()
+  });
+});
+
+router.get('/customer', function(req, res, next) {
+  ethereum.getUserAccounts(function(accounts){
+    res.render('select', {
+      typename: 'customer',
+      title: '請選擇顧客',
+      select: accounts
+    });
+  });
+});
+
+router.get('/customer/:name', function(req, res, next) {
+  ethereum.getUserAccounts(function(accounts){
+    res.render('customer', {
+      cust: req.params.name,
+      orders: database.getOrdersByCust(req.params.name, 'padding'),
+      custs: accounts
+    });
+  });
 });
 
 router.get('/shops', function(req, res, next) {
@@ -24,6 +70,12 @@ router.get('/menuOf', function(req, res, next) {
     return { id: elt[0], name: elt[1], value: elt[2] }
   }));
 
+});
+
+
+router.get('/about', function(req, res, next) {
+  res.render('about', {
+  });
 });
 
 router.get('/order', function(req, res, next) {
@@ -42,9 +94,10 @@ function seqExecInsertOrderDish(orderId, dishes){
 }
 
 
-router.post('/post_order', function(req, res, next) {
+router.post('/post_order', function(req, res, placeOrdernext) {
   /* in:
    * { shop: "四五大街",
+   *   buyer: '0x000000001',
    *   dish: [
    *     { id: 0, amount: 2 }
    *     { id: 3, amount: 4 }
@@ -62,16 +115,28 @@ router.post('/post_order', function(req, res, next) {
   let succ = database.exec('BEGIN;') &&
     database.insertOrder(
       orderId,
+      req.body.buyer,
       req.body.shop,
       req.body.price) &&
     seqExecInsertOrderDish(orderId, dishes);
 
-  database.exec(succ ? 'COMMIT;' : 'ROLLBACK;');
-  res.send({
-    status: succ ? "success" : "failed",
-    code: succ ? 200 : 500
-  });
-
+  if(succ){
+    ethereum.placeOrder(orderId, req.body.shop, req.body.buyer,
+      req.body.price, function(succ){
+        database.exec(succ ? 'COMMIT;' : 'ROLLBACK;');
+        res.send({
+          status: succ ? "success" : "failed",
+          code: succ ? 200 : 500
+        });
+      })
+  }
+  else{
+    database.exec('ROLLBACK;');
+    res.send({
+      status: "failed",
+      code: 500
+    });
+  }
 });
 
 
@@ -124,20 +189,43 @@ router.get('/drop', function(req, res, next) {
   //console.log(req.query.id)
   let succ = database.changeOrderState(req.query.id, 'dropped');
 
-  res.send({
-    status: succ ? "success" : "failed",
-    code: succ ? 200 : 500
-  });
+  if(succ){
+    ethereum.cancelOrder(req.query.id, req.query.shop,
+      function(succ){
+        res.send({
+          status: succ ? "success" : "failed",
+          code: succ ? 200 : 500
+        });
+      });
+  }
+  else{
+    res.send({
+      status: "failed",
+      code: 500
+    });
+  }
 });
 
 router.get('/finish', function(req, res, next) {
   // finish order
   //console.log(req.query.id)
   let succ = database.changeOrderState(req.query.id, 'finished');
-  res.send({
-    status: succ ? "success" : "failed",
-    code: succ ? 200 : 500
-  });
+
+  if(succ){
+    ethereum.finishOrder(req.query.id, req.query.shop,
+      function(succ){
+        res.send({
+          status: succ ? "success" : "failed",
+          code: succ ? 200 : 500
+        });
+      });
+  }
+  else{
+    res.send({
+      status: "failed",
+      code: 500
+    });
+  }
 });
 
 router.get('/getMapApiKey', function(req, res, next) {

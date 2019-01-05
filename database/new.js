@@ -9,11 +9,14 @@ function createNewDatabase(){
   l_sqlstr = `CREATE TABLE orders (
                 id INTEGER PRIMARY KEY,
                 r_name char,
+                c_name char,
                 price int,
                 status char
               );`
-  l_sqlstr += "INSERT INTO orders VALUES (0, '樂山食堂', 260, 'padding');"
-  l_sqlstr += "INSERT INTO orders VALUES (1, '樂山食堂', 240, 'padding');"
+
+  //l_sqlstr += "INSERT INTO orders VALUES (0, '樂山食堂', 260, 'padding');"
+  //l_sqlstr += "INSERT INTO orders VALUES (1, '樂山食堂', 240, 'padding');"
+
   db.run(l_sqlstr);
 
   l_sqlstr = `CREATE TABLE order_dish (
@@ -22,8 +25,8 @@ function createNewDatabase(){
                 dish_id int,
                 amount int
               );`
-  l_sqlstr += "INSERT INTO order_dish(order_id, dish_id, amount) VALUES (0, 2, 2);"
-  l_sqlstr += "INSERT INTO order_dish(order_id, dish_id, amount) VALUES (1, 1, 2);"
+  //l_sqlstr += "INSERT INTO order_dish(order_id, dish_id, amount) VALUES (0, 2, 2);"
+  //l_sqlstr += "INSERT INTO order_dish(order_id, dish_id, amount) VALUES (1, 1, 2);"
   db.run(l_sqlstr);
 
   l_sqlstr = "CREATE TABLE heat (r_name char, people int, total int);"
@@ -36,9 +39,9 @@ function createNewDatabase(){
   l_sqlstr = "CREATE TABLE location (r_name char, longitude float, latitude float);"
   l_sqlstr += "INSERT INTO location VALUES ('樂山食堂', 24.988998, 121.573640);"
   l_sqlstr += "INSERT INTO location VALUES ('四五大街', 24.988303, 121.574231);"
-  
+
   l_sqlstr += "INSERT INTO location VALUES ('金鮨日式料理', 24.987119, 121.578585);"
-  
+
   db.run(l_sqlstr);
 
   // a:restaurant name , b:dish name , c:price

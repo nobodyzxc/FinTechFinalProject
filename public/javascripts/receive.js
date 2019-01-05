@@ -7,7 +7,7 @@ socket.on('renew order', function(data){
 });
 
 function drop(id){
-  if (confirm('drop ' + String(id))) {
+  if (confirm(`確定要捨棄棄單號 #${id} ?`)) {
     var parent = undefined;
     if($('#order-' + String(id)).children().last().hasClass('show')){
       parent = $('#order-' + String(id)).parent()
@@ -19,7 +19,8 @@ function drop(id){
 
     $('#order-' + String(id)).remove();
     $.get('/drop', {
-      id: id
+      id: id,
+      shop: $('#shopname').text()
     }, function(result){
       alert(JSON.stringify(result));
     })
@@ -27,7 +28,7 @@ function drop(id){
 }
 
 function finish(id){
-  if (confirm('finish ' + String(id))) {
+  if (confirm(`確定要接取單號 #${id} ?`)) {
     var parent = undefined;
     if($('#order-' + String(id)).children().last().hasClass('show')){
       parent = $('#order-' + String(id)).parent()
@@ -38,7 +39,8 @@ function finish(id){
     }
 
     $.get('/finish', {
-      id: id
+      id: id,
+      shop: $('#shopname').text()
     }, function(result){
       alert(JSON.stringify(result));
     })
@@ -53,13 +55,14 @@ function updateOrder(r_name, status){
     //alert("return");
     $(`#${status}-accordion`).empty();
     for(var i= 0; i < orders.length; i++){
-      var tab = '<tr>'
+      var tab = ''
       for(var j = 0; j < orders[i].dish.length; j++){
-        tab += `<td>${orders[i].dish[j].id}</td>
-                <td>${orders[i].dish[j].name}</td>
-                <td>${orders[i].dish[j].number}</td>`
+        tab += `<tr>
+                  <td>${orders[i].dish[j].id}</td>
+                  <td>${orders[i].dish[j].name}</td>
+                  <td>${orders[i].dish[j].number}</td>
+                </tr>`
       }
-      tab += '</tr>'
       $(`#${status}-accordion`).append(`
 <div id="order-${orders[i].id}" class="card">
   <div class="card-header">

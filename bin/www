@@ -28,12 +28,12 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server)
 
 io.sockets.on('connection', function(socket) {
-     socket.on('new order', function(data){
-        io.sockets.emit('renew order', data);
-     });
-    socket.on('new people', function(data){
-        io.sockets.emit('renew people', data);
-     });
+  socket.on('new order', function(data){
+    io.sockets.emit('renew order', data);
+  });
+  socket.on('new people', function(data){
+    io.sockets.emit('renew people', data);
+  });
 });
 
 /**
@@ -49,13 +49,13 @@ server.on('listening', onListening);
  */
 
 ethereum = require('../modules/ethereum');
-//try {
-ethereum.deploy();
-//}
-//catch(err) {
-//  console.log(err);
-//  process.exit(1);
-//}
+try {
+  ethereum.deploy();
+}
+catch(err) {
+  console.log(err);
+  process.exit(1);
+}
 
 /**
  * Normalize a port into a number, string, or false.

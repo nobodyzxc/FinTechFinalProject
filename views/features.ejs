@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>人潮回報及下單系統</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+    <!-- dataTable styles, select one -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <!-- style end -->
+
+    <link rel="stylesheet" href="stylesheets/style.css">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+    <script src="javascripts/bootstrap-input-spinner.js"></script>
+
+    <!-- self defined scripts -->
+
+    <script src="javascripts/index.js"></script>
+    <script>
+      shopmap = <%- JSON.stringify(people_map) %>;
+    </script>
+    <script src="javascripts/rank.js"></script>
+    <script src="javascripts/maps.js"></script>
+    <script src="javascripts/order.js"></script>
+    <script src="javascripts/upload.js"></script>
+
+    <!-- self defined end -->
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%= key %>&callback=initMap&language=zh-TW" async defer></script>
+
+  </head>
+  <body>
+
+    <nav class="navbar fixed-top navbar-expand-lg navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">數位金融期末專案</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Features<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="/restaurant">Restaurant</a>
+              <a class="dropdown-item" href="/customer">Customer</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container mt-3">
+      <br>
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs nav-justified">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
+        </li>
+        <li class="nav-item">
+          <a onclick='dropMarkers();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#heatrank">人潮排名</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#heatupload">人潮回報</a>
+        </li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="takeout" class="container tab-pane active"><br>
+          <br>
+          <br>
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  請選擇商家
+                </button>
+                <div id='shops' class="dropdown-menu">
+                  <% for(var i = 0; i < shops.length; i++){ %>
+                  <a class="dropdown-item" href="#" onclick='menuOf("<%= shops[i] %>")'><%= shops[i] %></a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <h4 id="shopname"></h4>
+            </div>
+            <div class="col">
+              <input id='defaultVal' type="number" value="1" min="1" step="1"/>
+            </div>
+          </div>
+          <br>
+          <br>
+          <div class="row">
+            <div id="menu-div" class="col">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>名稱</th>
+                    <th>單價</th>
+                    <th>新增</th>
+                  </tr>
+                </thead>
+                <tbody id="menu">
+                </tbody>
+              </table>
+            </div>
+            <div id="cart-div" class="col">
+              <form>
+                <table class="table" style="margin-bottom:0px">
+                  <thead>
+                    <tr>
+                      <th>名稱</th>
+                      <th>數量</th>
+                      <th>取消</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cart">
+                  </tbody>
+                </table>
+              </form>
+
+            </div>
+          </div>
+          <!-- The Modal -->
+          <div class="modal fade" id="myModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title">付款界面</h4>
+                  <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body table-bordered">
+                  <div class="row">
+                    <div class="col">
+                      <p>選擇帳號:</p>
+                    </div>
+                    <div class="col">
+                      <select id="accounts">
+                        <% for(var i = 0; i < accounts.length; i++){ %>
+                        <option selected="<%= i == 0 ? 'selected' : '' %>"><%= accounts[i] %></option>
+                        <% } %>
+                      </select>
+                    </div>
+                  </div>
+                  <table class="table table-sm ">
+                    <thead class="thead-light">
+                      <tr>
+                        <th class="text-center">name</th>
+                        <th class="text-center">$</th>
+                        <th class="text-center">#</th>
+                      </tr>
+                    </thead>
+                    <tbody id="bill" class="table-hover">
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                  <button onclick="submitMenu()" type="button" class="btn btn-primary" data-dismiss="modal">Confrim</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+        <div id="heatmap" class="container tab-pane fade"><br>
+          <ul class="nav nav-pills nav-justified">
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link active" data-toggle="tab" href="">客滿程度</a>
+            </li>
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link" data-toggle="tab" href="">空位數</a>
+            </li>
+            <li class="nav-item">
+              <a onclick="drawCircles(circleColor[this.textContent], getRadiiOf(this.textContent))" class="map-circle nav-link" data-toggle="tab" href="">顧客人數</a>
+            </li>
+          </ul>
+          <div id="map"></div>
+        </div>
+        <div id="heatrank" class="container tab-pane fade"><br>
+          <!-- <table id="rankTable" class="" style="width:100%"> -->
+          <!-- <table id="rankTable" class="table table-striped  row-border hover order-column" style="width:100%"> -->
+          <table id="rankTable" class="display dataTable table-bordered" style="width:100%">
+
+            <thead>
+              <tr>
+                <th>餐廳</th>
+                <th>客滿程度</th>
+                <th>空位數</th>
+                <th>顧客人數</th>
+              </tr>
+            </thead>
+            <tbody id="people">
+              <% for(let r of people_rank){ %>
+              <tr>
+                <td><%= r.name %></td>
+                <td><%= Math.floor(r.number / (r.avail + r.number) * 100) %>%</td>
+                <td><%= r.avail %></td>
+                <td><%= r.number %></td>
+              </tr>
+              <% } %>
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Restaurant</th>
+                <th>Customer</th>
+                <th>Available</th>
+                <th>Heat</th>
+              </tr>
+            </tfoot>
+
+          </table>
+        </div>
+        <div id="heatupload" class="container tab-pane fade"><br>
+          <br><br>
+          <div class="row">
+            <div class="col">
+              <div class="dropdown">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  請選擇商家
+                </button>
+                <div id='upload-shops' class="dropdown-menu">
+                  <% for(let i = 0; i < people_rank.length; i++){ %>
+                  <a class="dropdown-item" href="#people-rank-<%= i %>" onclick='uploadTo(this)'><%= people_rank[i].name %></a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <h3 id="upload-shopname"></h3>
+            </div>
+          </div>
+          <br><br>
+
+          <% for(let i = 0; i < people_rank.length; i++){ %>
+          <input id='people-rank-<%= i %>-cur' type="hidden" value="<%= people_rank[i].number %>"/>
+          <input id='people-rank-<%= i %>-tot' type="hidden" value="<%= people_rank[i].total %>"/>
+          <% } %>
+          <div id="uploadInput" class='invisible'>
+            <input onchange="updateProgress(this)" id='peopleSpinner' type="number" value="1" min="1" step="1"/>
+
+            <br>
+
+            <div class="progress">
+              <div id='peopleBar' class="progress-bar" style="width:70%">70%</div>
+            </div>
+
+            <br><br>
+
+            <button onclick="uploadPeople()" type="button" class="btn btn-primary float-right">Upload</button>
+          </div>
+
+          <!-- image uploading
+            <br><br>
+            <form action="/somewhere/to/upload" enctype="multipart/form-data">
+            <input type="file" id="progressbarTWInput" accept="image/gif, image/jpeg, image/png"/ >
+            <img id="preview_progressbarTW_img" src="#" />
+            </form>
+          -->
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
