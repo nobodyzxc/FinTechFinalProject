@@ -10,23 +10,9 @@ function getShopDataOf(type){
     myRows[index] = {};
     $cells.each(function(cellIndex) {
       if(cellIndex > 0 && $($headers[cellIndex]).html() == type){
-        //data[$cells.html()][$($headers[cellIndex]).html()] = $(this).html();
-        data[$cells.html()] = parseInt($(this).html());
+        data[$cells[0].innerText.trim()] = parseInt($(this).html());
       }
-      //else{
-      //  data[$cells.html()] = {};
-      //}
     });
   });
   return data;
 }
-
-//function updatePeopleRank(){
-//  $.get('/people', async function (res) {
-//    $('#people').empty();
-//    for (let r of res) {
-//      $('#people').append(`<tr><td>${r.name}</td><td>${r.number}</td><td>${r.avail}</td><td>${Math.floor(r.number / (r.avail + r.number) * 100)}%</td></tr>`);
-//    }
-//    $('#rankTable').DataTable();
-//  });
-//}

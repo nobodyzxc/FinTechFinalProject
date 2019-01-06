@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <!-- style end -->
 
+    <!-- fa icon -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+
     <link rel="stylesheet" href="stylesheets/style.css">
 
 
@@ -84,7 +87,7 @@
           <a id="order-food" class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
         </li>
         <li class="nav-item">
-          <a onclick='dropMarkers();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
+          <a id="people-map" onclick='dropMarkers();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#heatrank">人潮排名</a>
@@ -232,7 +235,9 @@
             <tbody id="people">
               <% for(let r of people_rank){ %>
               <tr>
-                <td><a onclick='gotoOrder("<%= r.name %>")'><%= r.name %></a></td>
+                <td >
+                  <i onclick="gotoMap('<%= r.name %>')" class="fas fa-map-marker-alt"></i>　<a class="gotoLink text-center" onclick='gotoOrder("<%= r.name %>")'><%= r.name %></a>
+                </td>
                 <td><%= Math.floor(r.number / (r.avail + r.number) * 100) %>%</td>
                 <td><%= r.avail %></td>
                 <td><%= r.number %></td>

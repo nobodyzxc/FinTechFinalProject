@@ -34,44 +34,45 @@ function drawCircles(color, radii){
 // Math.sqrt(shopmap[shop].population) * 5
 
 function dropMarkers() {
-  clearMarkers();
-  var i = 0;
-  for (var shop in shopmap){
-    addMarkerWithTimeout(shop, shopmap[shop].center, i * 200);
-    i += 1;
+  if($.isEmptyObject(markers)){
+    clearMarkers();
+    var i = 0;
+    for (var shop in shopmap){
+      addMarkerWithTimeout(shop, shopmap[shop].center, i * 600);
+      i += 1;
+    }
   }
 }
 
 function addMarkerWithTimeout(shop, position, timeout) {
-  let marker = new google.maps.Marker({
-    title: shop,
-    position: position,
-    map: map,
-    animation: google.maps.Animation.DROP
-  })
+  console.log('new');
   window.setTimeout(function() {
-    markers.push(markers);
+    let marker = new google.maps.Marker({
+      title: shop,
+      position: position,
+      map: map,
+      animation: google.maps.Animation.DROP
+    })
+    markers[shop] = marker;
+    google.maps.event.addListener(marker, "click", function() {
+      gotoOrder(shop);
+    });
+    google.maps.event.addListener(marker, "mouseover", function() {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    });
+    google.maps.event.addListener(marker, 'mouseout', function() {
+      marker.setAnimation(null);
+    });
   }, timeout);
-  google.maps.event.addListener(marker, "click", function() {
-    if(confirm(`前往 ${ shop } 下單?`)){
-      $('#order-food').click();
-      menuOf(shop);
-    }
-  });
-  google.maps.event.addListener(marker, "mouseover", function() {
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-  });
-  google.maps.event.addListener(marker, 'mouseout', function() {
-    marker.setAnimation(null);
-  });
 
 }
 
 function clearMarkers() {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
+
+  for(var k in markers){
+    markers[k].setMap(null);
   }
-  markers = [];
+  markers = {};
 }
 
 function clearCircles(){
@@ -90,4 +91,13 @@ function initMap(){
     });
 
   updateCircles();
+}
+
+function gotoMap(shop){
+  console.log('goto ' + shop);
+  for (var s in shopmap){
+    markers[s].setAnimation(null);
+  }
+  $('#people-map').click();
+  markers[shop].setAnimation(google.maps.Animation.BOUNCE);
 }

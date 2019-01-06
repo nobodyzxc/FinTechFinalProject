@@ -3,7 +3,7 @@
 var socket = io.connect();
 var map;
 var circles = {};
-var markers = [];
+var markers = {};
 var shopmap = undefined;
 var rankTable = undefined;
 
