@@ -22,26 +22,9 @@ $(document).ready(function() {
 
 socket.on('renew people', function(data){
   data = JSON.parse(data);
-  var newRow = [data.name, String(Math.floor(data.number / data.total * 100)) + '%', String(data.avail), String(data.number)];
+  var shop = `<i onclick="gotoMap('${data.name}')" class="fas fa-map-marker-alt"></i>　<a class="gotoLink text-center" onclick='gotoOrder("${data.name}")'>${data.name}</a>`
+  var newRow = [shop, String(Math.floor(data.number / data.total * 100)) + '%', String(data.avail), String(data.number)];
   rankTable.row($(`td:contains("${data.name}")`)[0].parentElement).data(newRow).draw();
 
   updateCircles();
 });
-
-//function sortOnKeys(dict) {
-//
-//    var sorted = [];
-//    for(var key in dict) {
-//        sorted[sorted.length] = key;
-//    }
-//    sorted.sort();
-//
-//    var tempDict = {};
-//    for(var i = 0; i < sorted.length; i++) {
-//        tempDict[sorted[i]] = dict[sorted[i]];
-//    }
-//
-//    return tempDict;
-//}
-//
-//dict = sortOnKeys(dict);

@@ -31,11 +31,14 @@ function drawCircles(color, radii){
   }
 }
 
-// Math.sqrt(shopmap[shop].population) * 5
+function stopMarkers() {
+  for (var shop in shopmap){
+    markers[shop].setAnimation(null);
+  }
+}
 
 function dropMarkers() {
   if($.isEmptyObject(markers)){
-    clearMarkers();
     var i = 0;
     for (var shop in shopmap){
       addMarkerWithTimeout(shop, shopmap[shop].center, i * 600);
@@ -45,7 +48,6 @@ function dropMarkers() {
 }
 
 function addMarkerWithTimeout(shop, position, timeout) {
-  console.log('new');
   window.setTimeout(function() {
     let marker = new google.maps.Marker({
       title: shop,
@@ -67,14 +69,6 @@ function addMarkerWithTimeout(shop, position, timeout) {
 
 }
 
-function clearMarkers() {
-
-  for(var k in markers){
-    markers[k].setMap(null);
-  }
-  markers = {};
-}
-
 function clearCircles(){
   for(var k in circles){
     circles[k].setMap(null);
@@ -94,10 +88,9 @@ function initMap(){
 }
 
 function gotoMap(shop){
-  console.log('goto ' + shop);
-  for (var s in shopmap){
-    markers[s].setAnimation(null);
-  }
   $('#people-map').click();
-  markers[shop].setAnimation(google.maps.Animation.BOUNCE);
+  window.setTimeout(function() {
+    markers[shop].setAnimation(google.maps.Animation.BOUNCE);
+  }, 1000);
+
 }
