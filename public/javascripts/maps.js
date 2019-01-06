@@ -53,7 +53,10 @@ function addMarkerWithTimeout(shop, position, timeout) {
     markers.push(markers);
   }, timeout);
   google.maps.event.addListener(marker, "click", function() {
-    alert(shop);
+    if(confirm(`前往 ${ shop } 下單?`)){
+      $('#order-food').click();
+      menuOf(shop);
+    }
   });
   google.maps.event.addListener(marker, "mouseover", function() {
     marker.setAnimation(google.maps.Animation.BOUNCE);

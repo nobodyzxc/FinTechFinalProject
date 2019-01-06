@@ -46,7 +46,7 @@
   <body>
 
     <nav class="navbar fixed-top navbar-expand-lg navbar navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">數位金融期末專案</a>
+      <a class="navbar-brand" href="/">數位金融期末專案</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -81,7 +81,7 @@
       <!-- Nav tabs -->
       <ul class="nav nav-tabs nav-justified">
         <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
+          <a id="order-food" class="nav-link active" data-toggle="tab" href="#takeout">外帶下訂</a>
         </li>
         <li class="nav-item">
           <a onclick='dropMarkers();' class="nav-link" data-toggle="tab" href="#heatmap">人潮地圖</a>
@@ -232,7 +232,7 @@
             <tbody id="people">
               <% for(let r of people_rank){ %>
               <tr>
-                <td><%= r.name %></td>
+                <td><a onclick='gotoOrder("<%= r.name %>")'><%= r.name %></a></td>
                 <td><%= Math.floor(r.number / (r.avail + r.number) * 100) %>%</td>
                 <td><%= r.avail %></td>
                 <td><%= r.number %></td>

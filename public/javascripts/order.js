@@ -130,3 +130,9 @@ function addDish(dish){
   calculatePrice();
 }
 
+function gotoOrder(shop){
+  if(confirm(`前往 ${ shop } 下單?`)){
+    $('#order-food').click();
+    menuOf(shop);
+  }
+}
