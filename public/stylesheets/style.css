@@ -44,6 +44,25 @@ body{
 
 .carousel .carousel-item img {
   min-height: 300px;
-  max-height: 500px;
+  max-height: 400px;
   object-fit: cover;
+}
+
+.carousel-caption h3 {
+    color: white;
+}
+
+.text {
+    font: bolder 12vw;
+    text-align: center;
+    margin: 0;
+    border: 4px ;
+    border-radius: 5%;
+    width: 50%;
+}
+
+.screen {
+    color: black;
+    mix-blend-mode: screen;
+    background-color: #343A40;
 }
