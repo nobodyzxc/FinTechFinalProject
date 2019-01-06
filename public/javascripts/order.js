@@ -99,7 +99,11 @@ function submitMenu(){
   };
 
   $.post('/post_order', {order: JSON.stringify(form)}, function(result) {
-    socket.emit('new order', $('#shopname').text());
+    socket.emit('new order', JSON.stringify({
+      restaurant: $('#shopname').text(),
+      customer: buyer,
+      type: 'padding'
+    }));
     alert(JSON.stringify(result));
     emptyCart();
     calculatePrice();

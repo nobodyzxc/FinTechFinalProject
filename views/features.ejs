@@ -56,14 +56,18 @@
             <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item active">
-            <a class="nav-link" href="#">Features<span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/features">Features<span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders</a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="/restaurant">Restaurant</a>
+              <a class="dropdown-item" href="/history">History</a>
               <a class="dropdown-item" href="/customer">Customer</a>
+              <a class="dropdown-item" href="/restaurant">Restaurant</a>
             </div>
+          </li>
+          <li class="nav-itemk">
+            <a class="nav-link" href="/chaininfo">ChainInfo</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/about">About</a>
@@ -168,7 +172,7 @@
                     <div class="col">
                       <select id="accounts">
                         <% for(var i = 0; i < accounts.length; i++){ %>
-                        <option selected="<%= i == 0 ? 'selected' : '' %>"><%= accounts[i] %></option>
+                        <option ><%= accounts[i] %></option>
                         <% } %>
                       </select>
                     </div>

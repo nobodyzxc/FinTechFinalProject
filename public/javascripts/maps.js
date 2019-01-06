@@ -37,19 +37,31 @@ function dropMarkers() {
   clearMarkers();
   var i = 0;
   for (var shop in shopmap){
-    addMarkerWithTimeout(shopmap[shop].center, i * 200);
+    addMarkerWithTimeout(shop, shopmap[shop].center, i * 200);
     i += 1;
   }
 }
 
-function addMarkerWithTimeout(position, timeout) {
+function addMarkerWithTimeout(shop, position, timeout) {
+  let marker = new google.maps.Marker({
+    title: shop,
+    position: position,
+    map: map,
+    animation: google.maps.Animation.DROP
+  })
   window.setTimeout(function() {
-    markers.push(new google.maps.Marker({
-      position: position,
-      map: map,
-      animation: google.maps.Animation.DROP
-    }));
+    markers.push(markers);
   }, timeout);
+  google.maps.event.addListener(marker, "click", function() {
+    alert(shop);
+  });
+  google.maps.event.addListener(marker, "mouseover", function() {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+  });
+  google.maps.event.addListener(marker, 'mouseout', function() {
+    marker.setAnimation(null);
+  });
+
 }
 
 function clearMarkers() {

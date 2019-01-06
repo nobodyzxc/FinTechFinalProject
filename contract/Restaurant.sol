@@ -2,7 +2,7 @@ pragma solidity ^0.4.23;
 
 contract Restaurant {
 
-    enum Status { Padding, Finished, Canceled }
+    enum Status { Padding, Accepted, Finished, Canceled }
 
     struct Order {
         address shop;
@@ -17,6 +17,7 @@ contract Restaurant {
     mapping(uint256 => Order) orders;
 
     event PlaceEvent(uint256 indexed id, address indexed shop, address indexed buyer, uint256 price, uint256 timestamp);
+    event AcceptEvent(uint256 indexed id, address indexed shop, address indexed buyer, uint256 price, uint256 timestamp);
     event CancelEvent(uint256 indexed id, address indexed shop, address indexed buyer, uint256 price, uint256 timestamp);
     event FinishEvent(uint256 indexed id, address indexed shop, address indexed buyer, uint256 price, uint256 timestamp);
 
@@ -24,25 +25,43 @@ contract Restaurant {
         owner = msg.sender;
     }
 
-    modifier isPadding(uint256 id) {
+
+    modifier notExist(uint256 id) {
+        require(orders[id].buyer == address(0),
+                "order has existed");
+        _;
+    }
+
+
+    modifier exist(uint256 id) {
+        require(orders[id].buyer != address(0),
+                "order doesn't exist");
+        _;
+    }
+
+    modifier isStatus(uint256 id, Status status) {
         require(
-            orders[id].status == Status.Padding ,
-            "order is not padding."
-        );
+            orders[id].status == status,
+            "order is not padding.");
         _;
     }
 
     modifier onlyShop(uint256 id) {
         require(
             msg.sender == orders[id].shop,
-            "Only restaurant can call this."
-        );
+            "Only restaurant can call this.");
         _;
     }
 
-    function place(uint256 id, address shop) public payable{
-        require(orders[id].buyer == address(0),
-                "order has existed");
+    modifier onlyParties(uint256 id) {
+        require(
+            msg.sender == orders[id].shop
+            || msg.sender == orders[id].buyer,
+            "Only restaurant or customer can call this.");
+        _;
+    }
+
+    function place(uint256 id, address shop) public payable notExist(id) {
         orders[id] = Order({
             shop: shop,
             buyer: msg.sender,
@@ -52,18 +71,25 @@ contract Restaurant {
         emit PlaceEvent(id, shop, msg.sender, msg.value, now);
     }
 
+    function accept(uint256 id) public exist(id) onlyShop(id) isStatus(id, Status.Padding) {
+        orders[id].status = Status.Accepted;
+        emit AcceptEvent(id, orders[id].shop, orders[id].buyer, orders[id].price, now);
+    }
 
-    function finish(uint256 id) public onlyShop(id) isPadding(id) {
-        require(orders[id].buyer != address(0),
-                "order doesn't exist");
+    function finish(uint256 id) public exist(id) onlyShop(id) isStatus(id, Status.Accepted) {
         orders[id].shop.transfer(orders[id].price);
         orders[id].status = Status.Finished;
         emit FinishEvent(id, orders[id].shop, orders[id].buyer, orders[id].price, now);
     }
 
-    function cancel(uint256 id) public onlyShop(id) isPadding(id) {
-        require(orders[id].buyer != address(0),
-                "order doesn't exist");
+    function cancel(uint256 id) public exist(id) onlyParties(id) {
+        if(msg.sender == orders[id].buyer){
+            require(orders[id].status == Status.Padding);
+        }
+        else{
+            require(orders[id].status == Status.Padding
+                    || orders[id].status == Status.Accepted);
+        }
         orders[id].buyer.transfer(orders[id].price);
         orders[id].status = Status.Canceled;
         emit CancelEvent(id, orders[id].shop, orders[id].buyer, orders[id].price, now);

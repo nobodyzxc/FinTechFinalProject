@@ -23,3 +23,27 @@ input[type=number]{
     display: none;
     visibility: hidden;
 }
+
+.carousel {
+    margin-bottom: 4rem;
+}
+.carousel {
+    position: relative;
+}
+
+body{
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+.carousel .carousel-item {
+  /* height: 300px; */
+  height: 100%;
+}
+
+.carousel .carousel-item img {
+  min-height: 300px;
+  max-height: 500px;
+  object-fit: cover;
+}

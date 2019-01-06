@@ -18,11 +18,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       $(document).ready(function() {
-        updateOrder('<%= typename %>', '<%= cust %>', Padding);
+        updateOrder('<%= typename %>', '', Padding);
       });
-      const Webtype = 'customer'; 
+      const Webtype = 'history';
     </script>
-
     <script src="/javascripts/receive.js"></script>
 
 
@@ -39,14 +38,14 @@
             <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/features">Features</a>
+            <a class="nav-link" href="/features">Features<span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item active dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders<span class="sr-only">(current)</span></a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
               <a class="dropdown-item" href="/history">History</a>
-              <a class="dropdown-item" href="/customer">Customer<span class="sr-only">(current)</span></a>
-              <a class="dropdown-item" href="/restaurant">Restaurant</a>
+              <a class="dropdown-item" href="/customer">Customer</a>
+              <a class="dropdown-item" href="/restaurant">Restaurant<span class="sr-only">(current)</span></a>
             </div>
           </li>
           <li class="nav-itemk">
@@ -58,35 +57,27 @@
         </ul>
       </div>
     </nav>
-
     <div class="container mt-3">
       <br><br>
       <div class="row">
-        <div class="col">
-          <div class="dropdown" style="float: left;">
-            <button id="ordername" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><%= cust %></button>
-            <div id='upload-shops' class="dropdown-menu">
-              <% for(var i = 0; i < custs.length; i++){ %>
-              <a class="dropdown-item" href="/customer/<%= custs[i] %>" ><%= custs[i] %></a>
-              <% } %>
-            </div>
+          <div style="float: left;">
+            <h3 id="ordername">訂單紀錄</h3>
           </div>
         </div>
       </div>
       <br>
-      <ul id='ordertype' class="nav nav-tabs nav-justified">
+      <ul id="ordertype" class="nav nav-tabs nav-justified">
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '<%= cust %>', Padding)" class="nav-link active" data-toggle="tab" href="#padding">Padding</a>
+          <a onclick="updateOrder('<%= typename %>', '', Padding)" class="nav-link active" data-toggle="tab" href="#padding">Padding</a>
         </li>
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '<%= cust %>', Accepted)" class="nav-link" data-toggle="tab" href="#accepted">Accepted</a>
-        </li>
-
-        <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '<%= cust %>', Finished)" class="nav-link" data-toggle="tab" href="#finished">Finished</a>
+          <a onclick="updateOrder('<%= typename %>', '', Accepted)" class="nav-link" data-toggle="tab" href="#accepted">Accepted</a>
         </li>
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '<%= cust %>', Canceled)" class="nav-link" data-toggle="tab" href="#canceled">Canceled</a>
+          <a onclick="updateOrder('<%= typename %>', '', Finished)" class="nav-link" data-toggle="tab" href="#finished">Finished</a>
+        </li>
+        <li class="nav-item">
+          <a onclick="updateOrder('<%= typename %>', '', Canceled)" class="nav-link" data-toggle="tab" href="#canceled">Canceled</a>
         </li>
       </ul>
 
