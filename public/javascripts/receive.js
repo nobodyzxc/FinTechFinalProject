@@ -201,7 +201,14 @@ function updateOrder(type, name, status){
           ${tab}
         </tbody>
       </table>
-      <p>總金額: ${orders[i].price}元<p>
+      <div class="row">
+        <div class="col float-left">
+          <p>總金額: ${orders[i].price}元<p>
+        </div>
+        <div class="col float-right">
+          ${Webtype == Restaurant ? `<p>由 ${orders[i].customer} 下單` : ``}
+        </div>
+      </div>
     </div>
   </div>
 </div>`);
