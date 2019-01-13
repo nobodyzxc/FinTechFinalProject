@@ -17,12 +17,9 @@
 
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      $(document).ready(function() {
-        updateOrder('<%= typename %>', '', Padding);
-      });
-      const Webtype = 'history';
-    </script>
+
+    <%= definitions %>
+
     <script src="/javascripts/receive.js"></script>
 
 
@@ -69,24 +66,24 @@
       <br>
       <ul id="ordertype" class="nav nav-tabs nav-justified">
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '', Padding)" class="nav-link active" data-toggle="tab" href="#padding">Padding</a>
+          <a onclick="updateOrder('<%= webtype %>', '', Pending)" class="nav-link active" data-toggle="tab" href="#pending">Pending</a>
         </li>
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '', Accepted)" class="nav-link" data-toggle="tab" href="#accepted">Accepted</a>
+          <a onclick="updateOrder('<%= webtype %>', '', Accepted)" class="nav-link" data-toggle="tab" href="#accepted">Accepted</a>
         </li>
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '', Finished)" class="nav-link" data-toggle="tab" href="#finished">Finished</a>
+          <a onclick="updateOrder('<%= webtype %>', '', Finished)" class="nav-link" data-toggle="tab" href="#finished">Finished</a>
         </li>
         <li class="nav-item">
-          <a onclick="updateOrder('<%= typename %>', '', Canceled)" class="nav-link" data-toggle="tab" href="#canceled">Canceled</a>
+          <a onclick="updateOrder('<%= webtype %>', '', Canceled)" class="nav-link" data-toggle="tab" href="#canceled">Canceled</a>
         </li>
       </ul>
 
       <br><br>
 
       <div class="tab-content">
-        <div id="padding" class="container tab-pane active"><br>
-          <div id="padding-accordion">
+        <div id="pending" class="container tab-pane active"><br>
+          <div id="pending-accordion">
           </div>
         </div>
         <div id="accepted" class="container tab-pane fade"><br>

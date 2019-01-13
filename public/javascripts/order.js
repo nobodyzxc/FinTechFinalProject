@@ -102,7 +102,7 @@ function submitMenu(){
     socket.emit('new order', JSON.stringify({
       restaurant: $('#shopname').text(),
       customer: buyer,
-      type: 'padding'
+      type: 'pending'
     }));
     alert(JSON.stringify(result));
     emptyCart();

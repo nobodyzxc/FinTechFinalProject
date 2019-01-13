@@ -1,11 +1,16 @@
 // var Webtype define in HTML
-const Padding = 'padding';
-const Accepted = 'accepted';
-const Canceled = 'canceled';
-const Customer = 'customer';
-const Finished = 'finished';
-const Restaurant = 'restaurant';
-const History = 'history';
+// var ReqName define in HTML
+// const Pending = 'pending';
+// const Accepted = 'accepted';
+// const Canceled = 'canceled';
+// const Customer = 'customer';
+// const Finished = 'finished';
+// const Restaurant = 'restaurant';
+// const History = 'history';
+
+$(document).ready(function() {
+  updateOrder(Webtype, ReqName, Pending);
+});
 
 var socket = io.connect();
 
@@ -30,7 +35,7 @@ socket.on('renew order', function(data){
     && data.type == Accepted) alert("您的訂單已被接受");
 
   if($('#ordername').text() == data.restaurant
-    && data.type == Padding) alert("有新訂單");
+    && data.type == Pending) alert("有新訂單");
 
   if(Webtype != History &&
     data.type == Canceled && data.who != Webtype)
@@ -138,13 +143,13 @@ function stuffButton(type, order, status){
                   <button onclick="cancel(${order.id}, '${order.restaurant}', '${order.customer}');" type="button" class="btn btn-primary float-md-right">Cancel</button>
                 </div>`
 
-  //status == "padding" ?
+  //status == "pending" ?
 
   if(type == Customer){
-    if(status == Padding) button += cancel_b;
+    if(status == Pending) button += cancel_b;
   }
   if(type == Restaurant){
-    if(status == Padding) button += accept_b + cancel_b;
+    if(status == Pending) button += accept_b + cancel_b;
     if(status == Accepted) button += finish_b + cancel_b;
   }
   if(button){
