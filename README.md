@@ -14,7 +14,3 @@ nodemon
 Structure:
 
 ![structure](./public/images/structure.png)
-
-Smart Contract:
-
-![contract](./public/images/pipeline.jpeg)
