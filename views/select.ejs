@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
+    <%- definitions %>
+
   </head>
   <body>
     <nav class="navbar fixed-top navbar-expand-lg navbar navbar-dark bg-dark">
@@ -32,9 +34,9 @@
           <li class="nav-item active dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orders<span class="sr-only">(current)</span></a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="/history">History<%- typename == 'history'  ? '<span class="sr-only">(current)</span>' : ''%></a>
-              <a class="dropdown-item" href="/customer">Customer<%- typename == 'customer'  ? '<span class="sr-only">(current)</span>' : '' %></a>
-              <a class="dropdown-item" href="/restaurant">Restaurant<%- typename == 'restaurant' ? '<span class="sr-only">(current)</span>' : '' %></a>
+              <a class="dropdown-item" href="/history">History<%- webtype == history  ? '<span class="sr-only">(current)</span>' : ''%></a>
+              <a class="dropdown-item" href="/customer">Customer<%- webtype == customer  ? '<span class="sr-only">(current)</span>' : '' %></a>
+              <a class="dropdown-item" href="/restaurant">Restaurant<%- webtype == restaurant ? '<span class="sr-only">(current)</span>' : '' %></a>
             </div>
           </li>
           <li class="nav-itemk">
@@ -58,7 +60,7 @@
             </button>
             <div id='shops' class="dropdown-menu">
               <% for(var i = 0; i < select.length; i++){ %>
-              <a class="dropdown-item" href="/<%= typename %>/<%= select[i] %>" ><%= select[i] %></a>
+              <a class="dropdown-item" href="/<%= webtype %>/<%= select[i] %>" ><%= select[i] %></a>
               <% } %>
             </div>
           </div>

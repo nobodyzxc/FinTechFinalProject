@@ -2,28 +2,7 @@ var express = require('express');
 var router = express.Router();
 var database = require('../modules/database');
 var ethereum = require('../modules/ethereum');
-
-const Pending = 'pending';
-const Accepted = 'accepted';
-const Canceled = 'canceled';
-const Finished = 'finished';
-const Customer = 'customer';
-const Restaurant = 'restaurant';
-const History = 'history';
-
-var HTMLDefs = (webtype, reqname) => `
-  <script>
-    const Pending = '${Pending}';
-    const Accepted = '${Accepted}';
-    const Canceled = '${Canceled}';
-    const Finished = '${Finished}';
-    const Customer = '${Customer}';
-    const Restaurant = '${Restaurant}';
-    const History = '${History}';
-    const Webtype = '${webtype}';
-    const ReqName = '${reqname}';
-  </script>
-`
+var state    = require('../modules/state');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -43,52 +22,60 @@ router.get('/features', function(req, res, next) {
   });
 });
 
-router.get(`/${Restaurant}`, function(req, res, next) {
+router.get(`/${state.Restaurant}`, function(req, res, next) {
   res.render('select', {
-    webtype: Restaurant,
+    webtype: state.Restaurant,
+    customer : state.Customer,
+    restaurant : state.Restaurant,
+    history : state.History,
+    definitions: state.HTMLDefs(state.Restaurant, ''),
     isRestaurant : true,
     title: '請選擇餐廳',
     select: database.getAllRestaurants()
   });
 });
 
-router.get(`/${Restaurant}/:name`, function(req, res, next) {
-  res.render(Restaurant, {
+router.get(`/${state.Restaurant}/:name`, function(req, res, next) {
+  res.render(state.Restaurant, {
     reqname: req.params.name,
-    webtype: Restaurant,
-    definitions: HTMLDefs(Customer, req.params.name),
-    orders: database.getOrdersByRest(req.params.name, Pending),
+    webtype: state.Restaurant,
+    definitions: state.HTMLDefs(state.Customer, req.params.name),
+    orders: database.getOrdersByRest(req.params.name, state.Pending),
     shops: database.getAllRestaurants()
   });
 });
 
-router.get(`/${Customer}`, function(req, res, next) {
+router.get(`/${state.Customer}`, function(req, res, next) {
   ethereum.getUserAccounts(function(accounts){
     res.render('select', {
-      webtype: Customer,
+      webtype: state.Restaurant,
+      customer : state.Customer,
+      restaurant : state.Restaurant,
+      history : state.History,
       title: '請選擇顧客',
+      definitions: state.HTMLDefs(state.Customer, ''),
       select: accounts
     });
   });
 });
 
-router.get(`/${Customer}/:name`, function(req, res, next) {
+router.get(`/${state.Customer}/:name`, function(req, res, next) {
   ethereum.getUserAccounts(function(accounts){
-    res.render(Customer, {
-      webtype: Customer,
+    res.render(state.Customer, {
+      webtype: state.Customer,
       reqname: req.params.name,
-      definitions: HTMLDefs(Customer, req.params.name),
-      orders: database.getOrdersByCust(req.params.name, Pending),
+      definitions: state.HTMLDefs(state.Customer, req.params.name),
+      orders: database.getOrdersByCust(req.params.name, state.Pending),
       custs: accounts
     });
   });
 });
 
-router.get(`/${History}`, function(req, res, next) {
-  res.render(History, {
-    webtype: History,
-    definitions: HTMLDefs(History, ''),
-    typename: History,
+router.get(`/${state.History}`, function(req, res, next) {
+  res.render(state.History, {
+    webtype: state.History,
+    definitions: state.HTMLDefs(state.History, ''),
+    typename: state.History,
   });
 });
 
@@ -114,10 +101,10 @@ router.get('/about', function(req, res, next) {
 
 router.get('/order', function(req, res, next) {
 
-  if(req.query.type == Restaurant){
+  if(req.query.type == state.Restaurant){
     res.send(database.getOrdersByRest(req.query.name, req.query.status));
   }
-  else if(req.query.type == Customer){
+  else if(req.query.type == state.Customer){
     res.send(database.getOrdersByCust(req.query.name, req.query.status));
   }
   else{
@@ -252,10 +239,10 @@ router.get('/cancel', function(req, res, next) {
   // cancel order
   //console.log(req.query.id)
   let succ = database.exec('BEGIN;') &&
-    database.changeOrderState(req.query.id, Canceled);
+    database.changeOrderState(req.query.id, state.Canceled);
 
   if(succ){
-    if(req.query.type == Customer){
+    if(req.query.type == state.Customer){
       ethereum.cancelOrderByCust(req.query.id, req.query.name,
         function(succ){
           database.exec(succ ? 'COMMIT;' : 'ROLLBACK;');
@@ -265,7 +252,7 @@ router.get('/cancel', function(req, res, next) {
           });
         });
     }
-    if(req.query.type == Restaurant){
+    if(req.query.type == state.Restaurant){
       ethereum.cancelOrderByRest(req.query.id, req.query.name,
         function(succ){
           database.exec(succ ? 'COMMIT;' : 'ROLLBACK;');
@@ -289,7 +276,7 @@ router.get('/finish', function(req, res, next) {
   // finish order
   //console.log(req.query.id)
   let succ = database.exec('BEGIN;') &&
-    database.changeOrderState(req.query.id, Finished);
+    database.changeOrderState(req.query.id, state.Finished);
 
   if(succ){
     ethereum.finishOrder(req.query.id, req.query.shop,
@@ -314,7 +301,7 @@ router.get('/accept', function(req, res, next) {
   // accept order
   //console.log(req.query.id)
   let succ = database.exec('BEGIN;') &&
-    database.changeOrderState(req.query.id, Accepted);
+    database.changeOrderState(req.query.id, state.Accepted);
 
   if(succ){
     ethereum.acceptOrder(req.query.id, req.query.shop,

@@ -17,14 +17,14 @@
 
 
     <script src="/socket.io/socket.io.js"></script>
+
+    <%- definitions %>
     <script>
-      const Webtype = '<%= webtype %>';
       $(document).ready(function() {
         updateOrder('<%= webtype %>', '<%= reqname %>', Pending);
       });
     </script>
 
-    <%= definitions %>
     <script src="/javascripts/receive.js"></script>
 
 

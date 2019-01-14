@@ -1,5 +1,6 @@
 var sql = require('sql.js')
 var fs = require("fs")
+var state    = require('./state');
 
 var restaurants = fs.readFileSync('database/restaurants.sqlite');
 var db = new SQL.Database(restaurants);
@@ -187,7 +188,7 @@ module.exports.changeOrderState = function(id, status){
 
 module.exports.insertOrder = function(oid, rname, cname, price){
   try{
- db.exec(`INSERT INTO orders(id, r_name, c_name, price, status) VALUES (${oid}, '${rname}', '${cname}', ${price}, 'padding');`);
+ db.exec(`INSERT INTO orders(id, r_name, c_name, price, status) VALUES (${oid}, '${rname}', '${cname}', ${price}, '${state.Pending}');`);
   }
   catch(err){
     console.log(err);

@@ -18,9 +18,8 @@
 
     <script src="/socket.io/socket.io.js"></script>
 
-    <%= definitions %>
+    <%- definitions %>
     <script>
-      const Webtype = '<%= webtype %>';
       $(document).ready(function() {
         updateOrder('<%= webtype %>', '<%= reqname %>', Pending);
       });
