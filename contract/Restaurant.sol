@@ -2,7 +2,7 @@ pragma solidity ^0.4.23;
 
 contract Restaurant {
 
-    enum Status { Padding, Accepted, Finished, Canceled }
+    enum Status { Pending, Accepted, Finished, Canceled }
 
     struct Order {
         address shop;
@@ -66,12 +66,12 @@ contract Restaurant {
             shop: shop,
             buyer: msg.sender,
             price: msg.value,
-            status: Status.Padding
+            status: Status.Pending
         });
         emit PlaceEvent(id, shop, msg.sender, msg.value, now);
     }
 
-    function accept(uint256 id) public exist(id) onlyShop(id) isStatus(id, Status.Padding) {
+    function accept(uint256 id) public exist(id) onlyShop(id) isStatus(id, Status.Pending) {
         orders[id].status = Status.Accepted;
         emit AcceptEvent(id, orders[id].shop, orders[id].buyer, orders[id].price, now);
     }
@@ -84,10 +84,10 @@ contract Restaurant {
 
     function cancel(uint256 id) public exist(id) onlyParties(id) {
         if(msg.sender == orders[id].buyer){
-            require(orders[id].status == Status.Padding);
+            require(orders[id].status == Status.Pending);
         }
         else{
-            require(orders[id].status == Status.Padding
+            require(orders[id].status == Status.Pending
                     || orders[id].status == Status.Accepted);
         }
         orders[id].buyer.transfer(orders[id].price);
